@@ -73,12 +73,13 @@ export default function ChatWindow({ conversationId }) {
   if (!conversation) return null;
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="flex flex-col h-dvh bg-background overflow-hidden">
       <Header 
         title={conversation.title} 
         showBack={true} 
         onSettingsClick={() => setIsSettingsOpen(true)}
         personas={conversation.personas}
+        activePersonaId={conversation.activePersona}
       />
       
       <MessageList 

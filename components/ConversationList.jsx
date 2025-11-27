@@ -64,14 +64,14 @@ export default function ConversationList() {
   return (
     <div className="flex flex-col h-full max-w-6xl mx-auto bg-background min-h-screen">
       {/* Enhanced Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-0 z-10">
-        <div className="flex h-16 items-center justify-between px-6">
+      <header className="mt-6 mx-2 md:mx-4 rounded-xl border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-2 z-10 shadow-sm">
+        <div className="flex h-14 md:h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <MessageSquare className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">Dual Chat</h1>
+              <h1 className="text-xl font-bold">Durden</h1>
               <p className="text-xs text-muted-foreground">
                 {conversations.length} {conversations.length === 1 ? 'conversation' : 'conversations'}
               </p>
@@ -79,15 +79,11 @@ export default function ConversationList() {
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Button onClick={handleCreate} className="gap-2">
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">New Chat</span>
-            </Button>
           </div>
         </div>
         
         {/* Search Bar */}
-        <div className="px-6 pb-4">
+        <div className="px-4 pb-3 md:px-6 md:pb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -101,58 +97,31 @@ export default function ConversationList() {
       </header>
 
       <ScrollArea className="flex-1">
-        <div className="p-6">
-          {/* Stats Row */}
-          {conversations.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="rounded-lg border bg-card p-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                  <MessageSquare className="h-4 w-4" />
-                  Total Messages
-                </div>
-                <div className="text-2xl font-bold">
-                  {conversations.reduce((acc, conv) => acc + conv.messages.length, 0)}
-                </div>
-              </div>
-              <div className="rounded-lg border bg-card p-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                  <Clock className="h-4 w-4" />
-                  Recent
-                </div>
-                <div className="text-2xl font-bold">
-                  {conversations.filter(c => {
-                    const lastMsg = c.messages[c.messages.length - 1];
-                    const ts = lastMsg ? lastMsg.ts : c.createdAt;
-                    return Date.now() - ts < 24 * 60 * 60 * 1000;
-                  }).length}
-                </div>
-              </div>
-            </div>
-          )}
+        <div className="p-4 md:p-8">
+          {/* Hero Action Button */}
+          <div className="mb-8">
+            <Button 
+              onClick={handleCreate} 
+              className="w-full h-14 rounded-2xl text-lg font-medium shadow-md hover:shadow-lg transition-all"
+            >
+              <Plus className="mr-2 h-5 w-5" />
+              Start New Conversation
+            </Button>
+          </div>
 
           {/* Conversations Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filteredConversations.length === 0 ? (
-              <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
+              <div className="col-span-full flex flex-col items-center justify-center py-10 text-center text-muted-foreground">
                 {searchQuery ? (
                   <>
-                    <Search className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                    <h3 className="text-lg font-medium mb-2">No results found</h3>
-                    <p className="text-muted-foreground text-sm max-w-sm">
-                      Try adjusting your search terms
-                    </p>
+                    <Search className="h-12 w-12 opacity-20 mb-4" />
+                    <p>No results found</p>
                   </>
                 ) : (
                   <>
-                    <MessageSquare className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                    <h3 className="text-lg font-medium mb-2">No conversations yet</h3>
-                    <p className="text-muted-foreground text-sm max-w-sm mb-4">
-                      Start your first dual-persona conversation
-                    </p>
-                    <Button onClick={handleCreate} className="gap-2">
-                      <Plus className="h-4 w-4" />
-                      Create Conversation
-                    </Button>
+                    <MessageSquare className="h-12 w-12 opacity-20 mb-4" />
+                    <p>No conversations yet</p>
                   </>
                 )}
               </div>
@@ -190,7 +159,7 @@ export default function ConversationList() {
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                        className="h-8 w-8 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shrink-0"
                         onClick={(e) => handleDelete(e, conv.conversationId)}
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
@@ -204,26 +173,6 @@ export default function ConversationList() {
                           ? lastMessage.text 
                           : "Start chatting with your dual personas"}
                       </p>
-                    </div>
-
-                    {/* Personas Preview */}
-                    <div className="flex items-center gap-2 px-5 py-3 border-t bg-muted/30">
-                      <div className="flex -space-x-2">
-                        {Object.values(conv.personas || {}).map((persona) => (
-                          <div 
-                            key={persona.id}
-                            className="flex h-6 w-6 items-center justify-center rounded-full bg-background border-2 border-card ring-1 ring-muted"
-                            title={persona.name}
-                          >
-                            <span className="text-[10px] font-medium">
-                              {persona.name.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        {Object.values(conv.personas || {}).map(p => p.name).join(' & ')}
-                      </span>
                     </div>
                   </Link>
                 );

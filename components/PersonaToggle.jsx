@@ -25,7 +25,7 @@ export default function PersonaToggle({ activePersonaId, personas, onToggle, cla
           onCheckedChange={() => onToggle(isB ? 'A' : 'B')}
           aria-label="Toggle persona"
         />
-        <Avatar className="h-8 w-8 border border-border">
+        <Avatar className="h-8 w-8 border border-input ring-offset-background focus-visible:outline-none focus-visible:ring-ring focus-visible:ring-offset-2">
           <AvatarImage src={currentPersona.avatar} />
           <AvatarFallback>{currentPersona.name.substring(0, 2).toUpperCase()}</AvatarFallback>
         </Avatar>

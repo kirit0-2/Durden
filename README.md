@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dual-Persona Chat
 
-## Getting Started
+A mobile-first, Black & White chat application where you play both sides. Built with Next.js, Tailwind CSS, and shadcn/ui.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Dual Personas**: Roleplay as Persona A ("Me") and Persona B ("Alter").
+- **Strict B&W Theme**: No colors, just grayscale.
+- **Mobile-First**: Optimized for mobile usage with keyboard handling.
+- **Persistence**: All data stored in LocalStorage.
+- **Image Uploads**: Upload avatars (stored locally).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Next.js (App Router)
+- React
+- Tailwind CSS (v4)
+- shadcn/ui (Radix Primitives)
+- LocalStorage for persistence
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Setup
 
-## Learn More
+1. Install dependencies:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Run the development server:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+3. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Testing
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Manual**: Open the app, create a conversation, switch personas, send messages, upload avatars.
+- **Lint**: `npm run lint`
+
+## Notes
+
+- **Keyboard Handling**: Uses `visualViewport` API to detect keyboard on mobile and adjust the input layout.
+- **Storage**: Images are compressed to <300KB to fit in LocalStorage. If storage is full, an alert will appear.

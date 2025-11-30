@@ -44,14 +44,27 @@ export default function MessageList({ messages, personas }) {
             No messages yet. Start the conversation!
           </div>
         ) : (
-          messages.map((msg) => (
-            <MessageBubble 
-              key={msg.id} 
-              message={msg} 
-              persona={personas[msg.personaId]} 
-              isMe={msg.personaId === 'A'} 
-            />
-          ))
+          messages.map((msg, index) => {
+            const prevMsg = messages[index - 1];
+            const isNewDay = !prevMsg || new Date(msg.ts).toDateString() !== new Date(prevMsg.ts).toDateString();
+            
+            return (
+              <React.Fragment key={msg.id}>
+                {isNewDay && (
+                  <div className="flex justify-center my-4">
+                    <span className="text-xs font-medium text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
+                      {new Date(msg.ts).toLocaleDateString('en-US', { month: 'short', day: '2-digit' })}
+                    </span>
+                  </div>
+                )}
+                <MessageBubble 
+                  message={msg} 
+                  persona={personas[msg.personaId]} 
+                  isMe={msg.personaId === 'A'} 
+                />
+              </React.Fragment>
+            );
+          })
         )}
       </div>
     </ScrollArea>

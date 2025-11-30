@@ -5,9 +5,11 @@ import MessageInput from "./MessageInput";
 import SettingsModal from "./SettingsModal";
 import { getConversation, saveConversation, addMessage, updatePersona, generateMessageId } from "@/lib/storage";
 import { useRouter } from 'next/navigation';
+import { useToast } from "@/components/ui/use-toast"
 
 export default function ChatWindow({ conversationId }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [conversation, setConversation] = useState(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -29,43 +31,85 @@ export default function ChatWindow({ conversationId }) {
   const handleSendMessage = (text) => {
     if (!conversation) return;
     
-    const newMessage = {
-      id: generateMessageId(),
-      personaId: conversation.activePersona,
-      text,
-      ts: Date.now()
-    };
+    try {
+      const newMessage = {
+        id: generateMessageId(),
+        personaId: conversation.activePersona,
+        text,
+        ts: Date.now()
+      };
 
-    const updatedConv = addMessage(conversation.conversationId, newMessage);
-    setConversation({ ...updatedConv });
+      const updatedConv = addMessage(conversation.conversationId, newMessage);
+      setConversation({ ...updatedConv });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error sending message",
+        description: error.message,
+      });
+    }
   };
 
   const handleTogglePersona = (personaId) => {
     if (!conversation) return;
-    const updatedConv = { ...conversation, activePersona: personaId };
-    saveConversation(updatedConv);
-    setConversation(updatedConv);
+    try {
+      const updatedConv = { ...conversation, activePersona: personaId };
+      saveConversation(updatedConv);
+      setConversation(updatedConv);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error switching persona",
+        description: error.message,
+      });
+    }
   };
 
   const handleUpdatePersona = (personaId, updates) => {
     if (!conversation) return;
-    const updatedConv = updatePersona(conversation.conversationId, personaId, updates);
-    setConversation({ ...updatedConv });
+    try {
+      const updatedConv = updatePersona(conversation.conversationId, personaId, updates);
+      setConversation({ ...updatedConv });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error updating persona",
+        description: error.message,
+      });
+    }
   };
 
   const handleRenameConversation = (newTitle) => {
     if (!conversation) return;
-    const updatedConv = { ...conversation, title: newTitle };
-    saveConversation(updatedConv);
-    setConversation(updatedConv);
+    try {
+      const updatedConv = { ...conversation, title: newTitle };
+      saveConversation(updatedConv);
+      setConversation(updatedConv);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error renaming conversation",
+        description: error.message,
+      });
+    }
   };
 
   const handleClearMessages = () => {
     if (!conversation) return;
-    if (confirm("Clear all messages? This cannot be undone.")) {
-        const updatedConv = { ...conversation, messages: [] };
-        saveConversation(updatedConv);
-        setConversation(updatedConv);
+    try {
+      const updatedConv = { ...conversation, messages: [] };
+      saveConversation(updatedConv);
+      setConversation(updatedConv);
+      toast({
+        title: "Messages cleared",
+        description: "All messages have been removed from this conversation.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error clearing messages",
+        description: error.message,
+      });
     }
   };
 

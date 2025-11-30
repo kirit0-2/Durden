@@ -6,6 +6,17 @@ import { Plus, Trash2, Search, MessageSquare, Clock } from "lucide-react";
 import Link from 'next/link';
 import ThemeToggle from './ThemeToggle';
 import { getConversationsList, getConversation, createConversation, deleteConversation } from "@/lib/storage";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { useToast } from "@/components/ui/use-toast"
 
 const timeAgo = (timestamp) => {
   if (!timestamp) return '';
@@ -23,6 +34,9 @@ const timeAgo = (timestamp) => {
 export default function ConversationList() {
   const [conversations, setConversations] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [deleteId, setDeleteId] = useState(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   const loadConversations = () => {
     const ids = getConversationsList();
@@ -42,17 +56,37 @@ export default function ConversationList() {
   }, []);
 
   const handleCreate = () => {
-    const newConv = createConversation(`Conversation ${conversations.length + 1}`);
-    // Redirect handled by Link usually, but here we just reload list or nav
-    window.location.href = `/conversation/${newConv.conversationId}`;
+    try {
+      const newConv = createConversation(`Conversation ${conversations.length + 1}`);
+      // Redirect handled by Link usually, but here we just reload list or nav
+      window.location.href = `/conversation/${newConv.conversationId}`;
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error creating conversation",
+        description: error.message,
+      });
+    }
   };
 
-  const handleDelete = (e, id) => {
+  const handleDeleteClick = (e, id) => {
     e.preventDefault(); // Prevent navigation
     e.stopPropagation();
-    if (confirm("Are you sure you want to delete this conversation?")) {
-      deleteConversation(id);
+    setDeleteId(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = (e) => {
+    if (e) e.stopPropagation();
+    if (deleteId) {
+      deleteConversation(deleteId);
       loadConversations();
+      setDeleteId(null);
+      setIsDeleteDialogOpen(false);
+      toast({
+        title: "Conversation deleted",
+        description: "The conversation has been permanently removed.",
+      });
     }
   };
 
@@ -160,7 +194,7 @@ export default function ConversationList() {
                         variant="ghost" 
                         size="icon" 
                         className="h-8 w-8 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shrink-0"
-                        onClick={(e) => handleDelete(e, conv.conversationId)}
+                        onClick={(e) => handleDeleteClick(e, conv.conversationId)}
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
@@ -181,6 +215,26 @@ export default function ConversationList() {
           </div>
         </div>
       </ScrollArea>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Conversation?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this conversation and all its messages.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

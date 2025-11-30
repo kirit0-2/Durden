@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +27,7 @@ export default function SettingsModal({
   const [title, setTitle] = useState(conversation.title);
   const [personaAName, setPersonaAName] = useState(conversation.personas.A.name);
   const [personaBName, setPersonaBName] = useState(conversation.personas.B.name);
+  const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
 
   const handleSave = () => {
     if (title !== conversation.title) onRenameConversation(title);
@@ -36,6 +47,7 @@ export default function SettingsModal({
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -98,7 +110,7 @@ export default function SettingsModal({
               <Download className="mr-2 h-4 w-4" />
               Export JSON
             </Button>
-            <Button variant="destructive" onClick={onClearMessages} className="w-full">
+            <Button variant="destructive" onClick={() => setIsClearDialogOpen(true)} className="w-full">
               <Trash2 className="mr-2 h-4 w-4" />
               Clear All Messages
             </Button>
@@ -110,5 +122,29 @@ export default function SettingsModal({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <AlertDialog open={isClearDialogOpen} onOpenChange={setIsClearDialogOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Clear All Messages?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. All messages in this conversation will be permanently deleted.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction 
+            onClick={() => {
+              onClearMessages();
+              setIsClearDialogOpen(false);
+            }}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            Clear Messages
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

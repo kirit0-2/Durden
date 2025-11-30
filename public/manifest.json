@@ -1,0 +1,22 @@
+{
+  "name": "Durden Chat",
+  "short_name": "Durden",
+  "description": "A mobile-first dual-persona chat application.",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icons/icon-512x512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

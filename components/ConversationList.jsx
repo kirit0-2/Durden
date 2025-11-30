@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, Trash2, Search, MessageSquare, Clock } from "lucide-react";
+import { Plus, Trash2, Search, MessageSquare, Clock, MoreVertical, Download } from "lucide-react";
 import Link from 'next/link';
 import ThemeToggle from './ThemeToggle';
 import { getConversationsList, getConversation, createConversation, deleteConversation } from "@/lib/storage";
@@ -16,6 +16,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useToast } from "@/components/ui/use-toast"
 
 const timeAgo = (timestamp) => {
@@ -74,6 +80,38 @@ export default function ConversationList() {
     e.stopPropagation();
     setDeleteId(id);
     setIsDeleteDialogOpen(true);
+  };
+
+  const handleExport = (e, conv) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    try {
+      const text = conv.messages.map(m => 
+        `[${new Date(m.ts).toLocaleString()}] ${conv.personas[m.personaId].name}: ${m.text}`
+      ).join('\n');
+      
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${conv.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Conversation exported",
+        description: "Download started.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Export failed",
+        description: error.message,
+      });
+    }
   };
 
   const confirmDelete = (e) => {
@@ -190,14 +228,33 @@ export default function ConversationList() {
                           </span>
                         </div>
                       </div>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shrink-0"
-                        onClick={(e) => handleDeleteClick(e, conv.conversationId)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      
+                      {/* Three Dot Menu */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shrink-0"
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                          >
+                            <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                          <DropdownMenuItem onClick={(e) => handleExport(e, conv)}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Export Contact
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={(e) => handleDeleteClick(e, conv.conversationId)}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete Conversation
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
 
                     {/* Last Message Preview */}

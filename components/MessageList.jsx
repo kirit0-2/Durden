@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MessageBubble from "./MessageBubble";
 
-export default function MessageList({ messages, personas }) {
+export default function MessageList({ messages, personas, onEditMessage, onDeleteMessage }) {
   const scrollRef = useRef(null);
   const viewportRef = useRef(null);
   const prevMessageCountRef = useRef(messages.length);
@@ -61,6 +61,8 @@ export default function MessageList({ messages, personas }) {
                   message={msg} 
                   persona={personas[msg.personaId]} 
                   isMe={msg.personaId === 'A'} 
+                  onEdit={onEditMessage}
+                  onDelete={onDeleteMessage}
                 />
               </React.Fragment>
             );

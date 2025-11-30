@@ -1,14 +1,26 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, RefreshCw } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.matchMedia("(pointer: coarse)").matches);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+  return isMobile;
+}
+
 export default function MessageInput({ activePersonaId, personas, onTogglePersona, onSendMessage }) {
   const [text, setText] = useState("");
   const [isRotating, setIsRotating] = useState(false);
   const textareaRef = useRef(null);
+  const isMobile = useIsMobile();
 
   const handleSend = () => {
     if (!text.trim()) return;
@@ -24,9 +36,22 @@ export default function MessageInput({ activePersonaId, personas, onTogglePerson
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+    if (e.key === 'Enter') {
+      if (isMobile) {
+        // Mobile: Enter adds new line (default behavior), so we do nothing here
+        // unless we want to prevent submission.
+        // User said: "if clicked enter in keyboard(mobile) make it line change"
+        // Default is line change.
+        return;
+      } else {
+        // Desktop:
+        // Shift+Enter -> New Line (Default)
+        // Enter -> Send
+        if (!e.shiftKey) {
+          e.preventDefault();
+          handleSend();
+        }
+      }
     }
   };
 
@@ -64,7 +89,7 @@ export default function MessageInput({ activePersonaId, personas, onTogglePerson
           onChange={handleInput}
           onKeyDown={handleKeyDown}
           placeholder={`Message as ${currentPersona.name}...`}
-          className="min-h-[44px] max-h-[150px] resize-none py-3 flex-1"
+          className="min-h-[44px] max-h-[150px] resize-none py-3 flex-1 [&::-webkit-scrollbar]:hidden scrollbar-none"
           rows={1}
         />
 

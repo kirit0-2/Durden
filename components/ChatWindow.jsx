@@ -3,7 +3,7 @@ import Header from "./Header";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 import SettingsModal from "./SettingsModal";
-import { getConversation, saveConversation, addMessage, updatePersona, generateMessageId } from "@/lib/storage";
+import { getConversation, saveConversation, addMessage, updatePersona, generateMessageId, editMessage, deleteMessage } from "@/lib/storage";
 import { useRouter } from 'next/navigation';
 import { useToast } from "@/components/ui/use-toast"
 
@@ -45,6 +45,34 @@ export default function ChatWindow({ conversationId }) {
       toast({
         variant: "destructive",
         title: "Error sending message",
+        description: error.message,
+      });
+    }
+  };
+
+  const handleEditMessage = (messageId, newText) => {
+    if (!conversation) return;
+    try {
+      const updatedConv = editMessage(conversation.conversationId, messageId, newText);
+      setConversation({ ...updatedConv });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error editing message",
+        description: error.message,
+      });
+    }
+  };
+
+  const handleDeleteMessage = (messageId) => {
+    if (!conversation) return;
+    try {
+      const updatedConv = deleteMessage(conversation.conversationId, messageId);
+      setConversation({ ...updatedConv });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error deleting message",
         description: error.message,
       });
     }
@@ -129,6 +157,8 @@ export default function ChatWindow({ conversationId }) {
       <MessageList 
         messages={conversation.messages} 
         personas={conversation.personas} 
+        onEditMessage={handleEditMessage}
+        onDeleteMessage={handleDeleteMessage}
       />
       
       <MessageInput 
